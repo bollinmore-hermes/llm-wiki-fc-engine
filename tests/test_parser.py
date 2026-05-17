@@ -196,3 +196,33 @@ def test_parser_invalid_file_extension():
     finally:
         if os.path.exists(dummy_file):
             os.remove(dummy_file)
+
+@patch("pdfplumber.open")
+def test_parser_table_cleaning_requested(mock_open):
+    """Tests the specific table cleaning case requested in the task."""
+    parser = PDFParser()
+    
+    # Mock Table
+    mock_table = MagicMock()
+    mock_table.bbox = (0, 0, 100, 100)
+    mock_table.extract.return_value = [["Cell 1", "Cell 2\nwith\nnewlines"], ["Cell 3  ", "  Cell 4"]]
+    
+    # Mock Page
+    mock_page = MagicMock()
+    mock_page.width = 100
+    mock_page.find_tables.return_value = [mock_table]
+    mock_page.extract_words.return_value = []
+    mock_page.chars = []
+
+    # Mock PDF
+    mock_pdf = MagicMock()
+    mock_pdf.pages = [mock_page]
+    mock_open.return_value.__enter__.return_value = mock_pdf
+
+    with patch("os.path.exists", return_value=True):
+        blocks = parser.extract_content("dummy.pdf")
+
+    # Assert
+    table_block = next(b for b in blocks if b['type'] == 'table')
+    expected_content = [["Cell 1", "Cell 2 with newlines"], ["Cell 3", "Cell 4"]]
+    assert table_block['content'] == expected_content

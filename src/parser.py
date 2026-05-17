@@ -201,12 +201,18 @@ class PDFParser:
                 bbox1[2] <= bbox2[2] + 0.5 and 
                 bbox1[3] <= bbox2[3] + 0.5)
 
-    def _clean_table_data(self, data):
+    def _clean_table_data(self, data: list[list[str | None]]) -> list[list[str]]:
+        """
+        Cleans table data by stripping whitespace and replacing newlines with spaces.
+        """
         cleaned = []
         for row in data:
             cleaned_row = []
             for cell in row:
-                if cell:
+                if cell is not None:
+                    # 1. Replace newlines with a space
+                    # 2. Strip leading/trailing whitespace
+                    # 3. Normalize multiple spaces to a single space
                     cleaned_cell = " ".join(cell.split())
                     cleaned_row.append(cleaned_cell)
                 else:
