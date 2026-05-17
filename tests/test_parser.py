@@ -151,6 +151,38 @@ def test_parser_block_type_detection(mock_open):
     assert contents[1] == 'Normal paragraph text.'
     assert contents[2] == '- List item one'
 
+@patch("pdfplumber.open")
+def test_parser_table_cleaning_complex(mock_open):
+    """Tests if table data is cleaned with complex whitespace and multiple newlines."""
+    parser = PDFParser()
+    
+    mock_table = MagicMock()
+    mock_table.bbox = (0, 0, 100, 100)
+    mock_table.extract.return_value = [
+        ["  Spaced  ", "\nNew\nLine\n"],
+        ["Multiple    Spaces", "Tab\tAnd\nNewline"]
+    ]
+    
+    mock_page = MagicMock()
+    mock_page.width = 100
+    mock_page.find_tables.return_value = [mock_table]
+    mock_page.extract_words.return_value = []
+    mock_page.chars = []
+    
+    mock_pdf = MagicMock()
+    mock_pdf.pages = [mock_page]
+    mock_open.return_value.__enter__.return_value = mock_pdf
+    
+    with patch("os.path.exists", return_value=True):
+        blocks = parser.extract_content("dummy.pdf")
+    
+    table_block = next(b for b in blocks if b['type'] == 'table')
+    expected_table = [
+        ["Spaced", "New Line"],
+        ["Multiple Spaces", "Tab And Newline"]
+    ]
+    assert table_block['content'] == expected_table
+
 def test_parser_invalid_file_extension():
     """Tests if PDFParser raises ValueError for a non-PDF file."""
     parser = PDFParser()

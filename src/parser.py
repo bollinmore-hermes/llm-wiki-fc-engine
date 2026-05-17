@@ -51,15 +51,20 @@ class PDFParser:
 
         # 1. Add tables as elements
         for table in tables:
-            data = table.extract()
-            elements.append({
-                "type": "table",
-                "content": self._clean_table_data(data),
-                "bbox": table.bbox,
-                "top": table.bbox[1],
-                "x0": table.bbox[0],
-                "width": table.bbox[2] - table.bbox[0]
-            })
+            try:
+                data = table.extract()
+                if data is not None:
+                    elements.append({
+                        "type": "table",
+                        "content": self._clean_table_data(data),
+                        "bbox": table.bbox,
+                        "top": table.bbox[1],
+                        "x0": table.bbox[0],
+                        "width": table.bbox[2] - table.bbox[0]
+                    })
+            except Exception:
+                # Robustly handle table extraction errors by skipping the failed table
+                continue
 
         # 2. Get text elements
         words = page.extract_words()
