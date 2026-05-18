@@ -4,7 +4,23 @@ Initial project scaffolding.
 
 ## Configuration
 
-To use the Gemini provider, you must provide a Google API Key via one of the following methods:
+To use the Gemini provider, you must provide a Google API Key. 
 
-1. **Environment Variable (Recommended)**: Set the `GOOGLE_API_KEY` environment variable in your shell (e.g., `export GOOGLE_API_KEY='your_api_key'`).
-2. **Configuration File**: Add the `api_key` field to your `config/settings.yaml` file.
+**⚠️ IMPORTANT SECURITY NOTE:** Never commit your API keys to version control (e.g., GitHub).
+
+### Recommended Setup: Using `.env` file
+
+1.  Create a `.env` file in the project root directory.
+2.  Add your key to the file:
+    ```env
+    GOOGLE_API_KEY=your_actual_api_key_here
+    ```
+3.  Ensure `.env` is listed in your `.gitignore` file (it is included by default in this project).
+
+### Alternative: Environment Variable
+
+You can also set the `GOOGLE_API_KEY` directly in your shell:
+```bash
+export GOOGLE_API_KEY='your_actual_api_key_here'
+```
+
