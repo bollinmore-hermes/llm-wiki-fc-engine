@@ -1,13 +1,14 @@
 import pdfplumber
 import os
 import statistics
+from typing import List, Dict, Union, Optional
 
 class PDFParser:
     """
     A parser for extracting structured blocks from PDF files.
     """
 
-    def extract_content(self, file_path: str) -> list[dict]:
+    def extract_content(self, file_path: str) -> List[Dict]:
         """
         Extracts structured blocks (paragraphs, headers, tables, etc.) from a PDF file.
 
@@ -15,7 +16,7 @@ class PDFParser:
             file_path (str): Path to the PDF file.
 
         Returns:
-            list[dict]: A list of blocks, each being a dictionary.
+            List[Dict]: A list of blocks, each being a dictionary.
 
         Raises:
             FileNotFoundError: If the file does not exist.
@@ -40,7 +41,7 @@ class PDFParser:
 
         return blocks
 
-    def _parse_page(self, page, page_num: int) -> list[dict]:
+    def _parse_page(self, page, page_num: int) -> List[Dict]:
         """
         Parses a single page into structured blocks.
         """
@@ -201,7 +202,7 @@ class PDFParser:
                 bbox1[2] <= bbox2[2] + 0.5 and 
                 bbox1[3] <= bbox2[3] + 0.5)
 
-    def _clean_table_data(self, data: list[list[str | None]]) -> list[list[str]]:
+    def _clean_table_data(self, data: List[List[Optional[str]]]) -> List[List[str]]:
         """
         Cleans table data by stripping whitespace and replacing newlines with spaces.
         """

@@ -34,7 +34,25 @@ class LLMOrchestrator:
 
     def process_blocks(self, blocks: list[dict]) -> str:
         # Phase 1: Extraction
-        text_blocks_content = "\n".join([b.get("text", "") for b in blocks])
+        processed_contents = []
+        for b in blocks:
+            content = b.get("content", "")
+            if isinstance(content, list):
+                # Convert list (e.g., table data) to a string representation
+                # For tables, we'll convert it to a simple markdown-like string
+                if content and isinstance(content[0], list):
+                    # It's a 2D list (table)
+                    rows = []
+                    for row in content:
+                        rows.append(" | ".join(row))
+                    processed_contents.append("\n".join(rows))
+                else:
+                    # It's a 1D list
+                    processed_contents.append(" ".join(map(str, content)))
+            else:
+                processed_contents.append(str(content))
+
+        text_blocks_content = "\n".join(processed_contents)
         extraction_input = self.extraction_prompt.format(text_blocks=text_blocks_content)
         extracted_data_raw = self.provider.generate_text(extraction_input)
         
